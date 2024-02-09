@@ -1,1 +1,66 @@
-test
+import React, { useState } from 'react';
+
+const MultipleListBoxes = () => {
+  const [list1, setList1] = useState([
+    { id: 1, value: 'Item 1' },
+    { id: 2, value: 'Item 2' },
+    { id: 3, value: 'Item 3' },
+  ]);
+  const [list2, setList2] = useState([]);
+  const [list3, setList3] = useState([]);
+
+  const moveItem = (fromList, setFromList, toList, setToList, itemId) => {
+    const itemToMove = fromList.find(item => item.id === itemId);
+    if (itemToMove) {
+      setFromList(prevList => prevList.filter(item => item.id !== itemId));
+      setToList(prevList => [...prevList, itemToMove]);
+    }
+  };
+
+  return (
+    <div>
+      <div>
+        <h2>List 1</h2>
+        <select multiple size={5}>
+          {list1.map(item => (
+            <option 
+              key={item.id}
+              onClick={() => moveItem(list1, setList1, list2, setList2, item.id)}
+            >
+              {item.value}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <h2>List 2</h2>
+        <select multiple size={5}>
+          {list2.map(item => (
+            <option 
+              key={item.id}
+              onClick={() => moveItem(list2, setList2, list3, setList3, item.id)}
+            >
+              {item.value}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <h2>List 3</h2>
+        <select multiple size={5}>
+          {list3.map(item => (
+            <option 
+              key={item.id}
+              onClick={() => moveItem(list3, setList3, list1, setList1, item.id)}
+            >
+              {item.value}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
+
+export default MultipleListBoxes;
+
