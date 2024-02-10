@@ -1,0 +1,102 @@
+import React, { useState } from 'react';
+
+const MultipleListBoxes = () => {
+  const [list1, setList1] = useState([
+    { id: 1, value: 'Item 1' },
+    { id: 2, value: 'Item 2' },
+    { id: 3, value: 'Item 3' },
+  ]);
+  const [list2, setList2] = useState([]);
+  const [list3, setList3] = useState([]);
+
+  const handleItemClick = (item, sourceList, setSourceList, targetList, setTargetList) => {
+    const newSourceList = sourceList.filter(listItem => listItem.id !== item.id);
+    setSourceList(newSourceList);
+    setTargetList([...targetList, item]);
+  };
+
+  const handleDragStart = (event, item) => {
+    event.dataTransfer.setData('item', JSON.stringify(item));
+  };
+
+  const handleDrop = (event, targetList, setTargetList) => {
+    const item = JSON.parse(event.dataTransfer.getData('item'));
+    setTargetList([...targetList, item]);
+    event.preventDefault();
+  };
+
+  const handleButtonClick = (sourceList, setSourceList, targetList, setTargetList) => {
+    const selectedItem = sourceList[0];
+    if (selectedItem) {
+      const newSourceList = sourceList.filter(item => item.id !== selectedItem.id);
+      setSourceList(newSourceList);
+      setTargetList([...targetList, selectedItem]);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{ border: '1px solid black', width: '30%', padding: '10px' }}
+        onDrop={event => handleDrop(event, list1, setList1)}
+        onDragOver={event => event.preventDefault()}
+      >
+        <h2>List 1</h2>
+        {list1.map(item => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={event => handleDragStart(event, item)}
+            onClick={() => handleItemClick(item, list1, setList1, list2, setList2)}
+          >
+            {item.value}
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{ border: '1px solid black', width: '30%', padding: '10px' }}
+        onDrop={event => handleDrop(event, list2, setList2)}
+        onDragOver={event => event.preventDefault()}
+      >
+        <h2>List 2</h2>
+        {list2.map(item => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={event => handleDragStart(event, item)}
+            onClick={() => handleItemClick(item, list2, setList2, list3, setList3)}
+          >
+            {item.value}
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{ border: '1px solid black', width: '30%', padding: '10px' }}
+        onDrop={event => handleDrop(event, list3, setList3)}
+        onDragOver={event => event.preventDefault()}
+      >
+        <h2>List 3</h2>
+        {list3.map(item => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={event => handleDragStart(event, item)}
+            onClick={() => handleItemClick(item, list3, setList3, list1, setList1)}
+          >
+            {item.value}
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <button onClick={() => handleButtonClick(list1, setList1, list2, setList2)}>Move from List 1 to List 2</button>
+        <button onClick={() => handleButtonClick(list2, setList2, list3, setList3)}>Move from List 2 to List 3</button>
+        <button onClick={() => handleButtonClick(list3, setList3, list1, setList1)}>Move from List 3 to List 1</button>
+      </div>
+    </div>
+  );
+};
+
+export default MultipleListBoxes;
