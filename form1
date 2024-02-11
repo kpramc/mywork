@@ -1,0 +1,143 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface Option {
+  id: number;
+  label: string;
+}
+
+const Form: React.FC = () => {
+  const [dropdownOptions1, setDropdownOptions1] = useState<Option[]>([]);
+  const [dropdownOptions2, setDropdownOptions2] = useState<Option[]>([]);
+  const [dropdownOptions3, setDropdownOptions3] = useState<Option[]>([]);
+  const [selectedOptions1, setSelectedOptions1] = useState<Option[]>([]);
+  const [selectedOptions2, setSelectedOptions2] = useState<Option[]>([]);
+  const [selectedOptions3, setSelectedOptions3] = useState<Option[]>([]);
+  const [inputValue1, setInputValue1] = useState('');
+  const [inputValue2, setInputValue2] = useState('');
+  const [inputValue3, setInputValue3] = useState('');
+
+  useEffect(() => {
+    // Fetch dropdown options using HTTP service
+    const fetchDropdownOptions = async () => {
+      try {
+        const response1 = await axios.get<Option[]>('/api/dropdown1');
+        setDropdownOptions1(response1.data);
+        
+        const response2 = await axios.get<Option[]>('/api/dropdown2');
+        setDropdownOptions2(response2.data);
+        
+        const response3 = await axios.get<Option[]>('/api/dropdown3');
+        setDropdownOptions3(response3.data);
+      } catch (error) {
+        console.error('Error fetching dropdown options:', error);
+      }
+    };
+
+    fetchDropdownOptions();
+  }, []);
+
+  const handleDropdownChange1 = (selected: Option[]) => {
+    setSelectedOptions1(selected);
+  };
+
+  const handleDropdownChange2 = (selected: Option[]) => {
+    setSelectedOptions2(selected);
+  };
+
+  const handleDropdownChange3 = (selected: Option[]) => {
+    setSelectedOptions3(selected);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Handle form submission here
+    console.log('Form submitted!');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="dropdown1">Dropdown 1</label>
+        <select
+          id="dropdown1"
+          multiple
+          value={selectedOptions1.map(option => option.id)}
+          onChange={(event) => {
+            const selectedIds = Array.from(event.target.selectedOptions, option => parseInt(option.value));
+            const selected = dropdownOptions1.filter(option => selectedIds.includes(option.id));
+            handleDropdownChange1(selected);
+          }}
+        >
+          {dropdownOptions1.map(option => (
+            <option key={option.id} value={option.id}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="dropdown2">Dropdown 2</label>
+        <select
+          id="dropdown2"
+          multiple
+          value={selectedOptions2.map(option => option.id)}
+          onChange={(event) => {
+            const selectedIds = Array.from(event.target.selectedOptions, option => parseInt(option.value));
+            const selected = dropdownOptions2.filter(option => selectedIds.includes(option.id));
+            handleDropdownChange2(selected);
+          }}
+        >
+          {dropdownOptions2.map(option => (
+            <option key={option.id} value={option.id}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="dropdown3">Dropdown 3</label>
+        <select
+          id="dropdown3"
+          multiple
+          value={selectedOptions3.map(option => option.id)}
+          onChange={(event) => {
+            const selectedIds = Array.from(event.target.selectedOptions, option => parseInt(option.value));
+            const selected = dropdownOptions3.filter(option => selectedIds.includes(option.id));
+            handleDropdownChange3(selected);
+          }}
+        >
+          {dropdownOptions3.map(option => (
+            <option key={option.id} value={option.id}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="input1">Input 1</label>
+        <input
+          type="text"
+          id="input1"
+          value={inputValue1}
+          onChange={(event) => setInputValue1(event.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="input2">Input 2</label>
+        <input
+          type="text"
+          id="input2"
+          value={inputValue2}
+          onChange={(event) => setInputValue2(event.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="input3">Input 3</label>
+        <input
+          type="text"
+          id="input3"
+          value={inputValue3}
+          onChange={(event) => setInputValue3(event.target.value)}
+        />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default Form;
