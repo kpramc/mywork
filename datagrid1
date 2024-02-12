@@ -1,0 +1,74 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface DataRow {
+  id: number;
+  column1: string;
+  column2: string;
+  column3: string;
+  column4: string;
+  column5: string;
+  column6: string;
+}
+
+const DataGrid: React.FC = () => {
+  const [data, setData] = useState<DataRow[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadData();
+  }, [currentPage]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://api.example.com/data?page=${currentPage}`);
+      const newData = response.data;
+      setData(prevData => [...prevData, ...newData]);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
+    if (scrollTop + clientHeight === scrollHeight && !loading) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  return (
+    <div style={{ height: '400px', overflowY: 'scroll' }} onScroll={handleScroll}>
+      <table>
+        <thead>
+          <tr>
+            <th>Column 1</th>
+            <th>Column 2</th>
+            <th>Column 3</th>
+            <th>Column 4</th>
+            <th>Column 5</th>
+            <th>Column 6</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map(row => (
+            <tr key={row.id}>
+              <td>{row.column1}</td>
+              <td>{row.column2}</td>
+              <td>{row.column3}</td>
+              <td>{row.column4}</td>
+              <td>{row.column5}</td>
+              <td>{row.column6}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {loading && <p>Loading...</p>}
+    </div>
+  );
+};
+
+export default DataGrid;
