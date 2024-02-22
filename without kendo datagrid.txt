@@ -1,0 +1,97 @@
+import React, { useState } from 'react';
+
+const DataGrid = ({ columns, data, pagination, pageSizeOptions, defaultPageSize }) => {
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState({ field: columns[0].field, dir: 'asc' });
+  const [skip, setSkip] = useState(0);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+  };
+
+  const handleSearch = () => {
+    // Implement your search logic here
+  };
+
+  const handleSortChange = (field) => {
+    if (sort.field === field) {
+      setSort({ ...sort, dir: sort.dir === 'asc' ? 'desc' : 'asc' });
+    } else {
+      setSort({ field, dir: 'asc' });
+    }
+  };
+
+  const handlePageChange = (event) => {
+    setSkip(event.target.value * pageSize);
+  };
+
+  const handlePageSizeChange = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+  };
+
+  const sortedData = data.slice().sort((a, b) => {
+    const aValue = a[sort.field];
+    const bValue = b[sort.field];
+    if (sort.dir === 'asc') {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0;
+    }
+  });
+
+  const filteredData = sortedData.filter((item) =>
+    Object.values(item).some((value) => value.toString().toLowerCase().includes(filter.toLowerCase()))
+  );
+
+  const paginatedData = pagination ? filteredData.slice(skip, skip + pageSize) : filteredData;
+
+  return (
+    <div>
+      <input
+        type="text"
+        style={{ width: '200px' }}
+        placeholder="Filter..."
+        value={filter}
+        onChange={handleFilterChange}
+      />
+      <button onClick={handleSearch}>Search</button>
+      <select onChange={handlePageSizeChange} value={pageSize}>
+        {pageSizeOptions.map((option) => (
+          <option key={option} value={option}>
+            {option} per page
+          </option>
+        ))}
+      </select>
+      <select onChange={handlePageChange} value={skip / pageSize}>
+        {Array.from({ length: Math.ceil(filteredData.length / pageSize) }).map((_, index) => (
+          <option key={index} value={index}>
+            Page {index + 1}
+          </option>
+        ))}
+      </select>
+      <table>
+        <thead>
+          <tr>
+            {columns.map((column, index) => (
+              <th key={index} onClick={() => handleSortChange(column.field)}>
+                {column.title} {sort.field === column.field && (sort.dir === 'asc' ? '⬆️' : '⬇️')}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedData.map((row, index) => (
+            <tr key={index}>
+              {columns.map((column, index) => (
+                <td key={index}>{row[column.field]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default DataGrid;
