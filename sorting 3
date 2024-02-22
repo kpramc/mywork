@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
+import { orderBy, process } from '@progress/kendo-data-query';
+import { Input, Button } from '@progress/kendo-react-inputs';
+
+const KendoGrid = ({ columns, data, pagination, pageSize }) => {
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState([{ field: columns[0].field, dir: 'asc' }]);
+  const [skip, setSkip] = useState(0);
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+  };
+
+  const handleSearch = () => {
+    // Implement your search logic here
+  };
+
+  const handleSortChange = (event) => {
+    const field = event.currentTarget.getAttribute('data-field');
+    const newSort = sort.map((item) => ({
+      field: item.field,
+      dir: item.field === field ? (item.dir === 'asc' ? 'desc' : 'asc') : null,
+    }));
+    setSort(newSort.filter((item) => item.dir !== null));
+  };
+
+  const handlePageChange = (event) => {
+    setSkip(event.page.skip);
+  };
+
+  const sortedData = orderBy(data, sort);
+
+  const paginatedData = pagination
+    ? process(sortedData, {
+        skip,
+        take: pageSize,
+      })
+    : sortedData;
+
+  return (
+    <div>
+      <Input
+        style={{ width: '200px' }}
+        placeholder="Filter..."
+        value={filter}
+        onChange={handleFilterChange}
+      />
+      <Button onClick={handleSearch}>Search</Button>
+      <Grid
+        data={paginatedData.data}
+        total={paginatedData.total}
+        skip={skip}
+        take={pageSize}
+        pageable={pagination}
+        onPageChange={handlePageChange}
+      >
+        <GridToolbar />
+        {columns.map((column, index) => (
+          <GridColumn
+            key={index}
+            field={column.field}
+            title={column.title}
+            sortable={true}
+            onSortChange={handleSortChange}
+            headerCellRender={({ column }) => (
+              <div onClick={handleSortChange} data-field={column.field}>
+                {column.title}{' '}
+                {sort.some((s) => s.field === column.field) && (
+                  <span>{sort.find((s) => s.field === column.field).dir === 'asc' ? '🔼' : '🔽'}</span>
+                )}
+              </div>
+            )}
+          />
+        ))}
+      </Grid>
+    </div>
+  );
+};
+
+export default KendoGrid;
