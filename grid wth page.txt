@@ -55,3 +55,33 @@ const KendoGrid = ({ columns, data, pagination, pageSize }) => {
 };
 
 export default KendoGrid;
+
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import KendoGrid from './KendoGrid';
+
+const columns = [
+  { field: 'id', title: 'ID' },
+  { field: 'name', title: 'Name' },
+  { field: 'age', title: 'Age' },
+  // Add more columns as needed
+];
+
+const data = [
+  { id: 1, name: 'John', age: 30 },
+  { id: 2, name: 'Jane', age: 25 },
+  // Add more data objects as needed
+];
+
+const App = () => {
+  return (
+    <div>
+      <h1>KendoGrid Example</h1>
+      <KendoGrid columns={columns} data={data} pagination={true} pageSize={5} />
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
